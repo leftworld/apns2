@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("asiohttp2", "for asiohttp2 support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("asiohttp2", "enable asiohttp2 support", "no");
+
+if (PHP_ASIOHTTP2 != "no") {
+	EXTENSION("asiohttp2", "asiohttp2.c");
+}
+
