@@ -5,8 +5,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <nghttp2/asio_http2.h>
 #include <nghttp2/asio_http2_client.h>
-#include <mutex>  
-#include <condition_variable> 
+#include <list>
 using boost::asio::ip::tcp;
 
 using namespace nghttp2::asio_http2;
@@ -32,13 +31,13 @@ class http2{
     int setHost(const char* h);
     int setPort(const char* p);
     int setPem(const char* pem);
+    int add2ready(data_fild * data);
     void on_connect(boost::asio::ip::tcp::resolver::iterator it);
     void on_close(uint32_t error_code);
     void on_error(const boost::system::error_code &ec);
   public:
     boost::system::error_code ec;
     boost::asio::io_service io_service;
-    boost::asio::ssl::context tls;
     session *sess;
     string host;
     string port;
@@ -48,8 +47,6 @@ class http2{
     error_cb error_call;
     int num;
     std::map<string, string> result;
-    std::mutex mut;
-    bool is_connect;
-    std::condition_variable connect_cond;
+    std::list<data_fild *> ready;
 };
 

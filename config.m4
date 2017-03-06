@@ -8,14 +8,14 @@ dnl without editing.
 dnl If your extension references something external, use with:
 
 dnl PHP_ARG_WITH(asiohttp2, for asiohttp2 support,
-dnl Make sure that the comment is aligned:
+dnl  Make sure that the comment is aligned:
 dnl [  --with-asiohttp2             Include asiohttp2 support])
 
 dnl Otherwise use enable:
 
-dnl PHP_ARG_ENABLE(asiohttp2, whether to enable asiohttp2 support,
-dnl Make sure that the comment is aligned:
-dnl [  --enable-asiohttp2           Enable asiohttp2 support])
+ PHP_ARG_ENABLE(asiohttp2, whether to enable asiohttp2 support,
+ Make sure that the comment is aligned:
+ [  --enable-asiohttp2           Enable asiohttp2 support])
 
 if test "$PHP_ASIOHTTP2" != "no"; then
   dnl Write more examples of tests here...
@@ -59,11 +59,11 @@ if test "$PHP_ASIOHTTP2" != "no"; then
   dnl
   dnl PHP_SUBST(ASIOHTTP2_SHARED_LIBADD)
   PHP_REQUIRE_CXX()
+  PHP_SUBST(ASIOHTTP2_SHARED_LIBADD)
   PHP_ADD_LIBRARY(stdc++, , ASIOHTTP2_SHARED_LIBADD)
   PHP_ADD_LIBRARY(nghttp2_asio, , ASIOHTTP2_SHARED_LIBADD)
   PHP_ADD_LIBRARY(ssl, , ASIOHTTP2_SHARED_LIBADD)
   PHP_ADD_LIBRARY(crypto, , ASIOHTTP2_SHARED_LIBADD)
   PHP_ADD_LIBRARY(boost_system, , ASIOHTTP2_SHARED_LIBADD)
-  PHP_SUBST(ASIOHTTP2_SHARED_LIBADD)
-  PHP_NEW_EXTENSION(asiohttp2, asiohttp2.c http2.cpp, $ext_shared, , "--std=c++11", "yes")
+  PHP_NEW_EXTENSION(asiohttp2, asiohttp2.cpp http2.cpp, $ext_shared, , "-std=gnu++11", "no")
 fi
