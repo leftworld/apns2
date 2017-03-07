@@ -1,12 +1,10 @@
 
-apns2
+#apns2
 	apns2 gcm high-performance push module for php 5.6 
-
 	base on libnghttp2 https://nghttp2.org  
-
 	high-performance over a million per minute!
 
-example
+#example
 
 		$a = new http20Client(); 
 		$a->setHost("nghttp2.org"); 
