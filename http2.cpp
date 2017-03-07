@@ -2,6 +2,7 @@
 
 http2::http2()  
 {
+  this->num = 0;
   this->close_call = std::bind(&http2::on_close, this, std::placeholders::_1);
   this->error_call = std::bind(&http2::on_error, this, std::placeholders::_1);
   this->connect_call = std::bind(&http2::on_connect, this, std::placeholders::_1); 
@@ -13,7 +14,6 @@ void http2::on_connect(boost::asio::ip::tcp::resolver::iterator it)
   {
     this->exec(m);
   }
-  this->ready.clear();
 }
 
 void http2::on_close(uint32_t error_code)
@@ -31,12 +31,19 @@ int http2::add2ready(data_fild * data)
 }
 void http2::on_error(const boost::system::error_code &ec)
 {
-  std::cerr << "error: " << ec.message() << std::endl;
+  this->error = ec.message();
+  this->sess->shutdown();
 }
 
 http2::~http2()
 {
   //cerr << "start delete" << endl;
+  for(auto m : this->ready)
+  {
+    delete (m);
+  }
+  this->ready.clear();
+  this->result.clear();
   if (this->sess)
     delete(this->sess);
   this->sess = NULL;
@@ -66,7 +73,6 @@ int http2::exec(data_fild *data)
   auto ptr = this;
   req->on_response([ptr, event_id](const response& res){
       res.on_data([ptr, event_id](const uint8_t *data, std::size_t len) {
-          //std::cerr.write(reinterpret_cast<const char *>(data), len);
           if (len > 0)
           {
             string str;
@@ -82,7 +88,6 @@ int http2::exec(data_fild *data)
       });
   req->on_close(this->close_call);
   this->num++;
-  delete (data);
   return 0;
 }
 

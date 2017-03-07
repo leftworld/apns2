@@ -6,6 +6,7 @@
 #include <nghttp2/asio_http2.h>
 #include <nghttp2/asio_http2_client.h>
 #include <list>
+#include <atomic>
 using boost::asio::ip::tcp;
 
 using namespace nghttp2::asio_http2;
@@ -26,7 +27,6 @@ class http2{
     http2();
     ~http2();
     int init();
-    int exec(data_fild *data);
     int wait_result();
     int setHost(const char* h);
     int setPort(const char* p);
@@ -48,5 +48,8 @@ class http2{
     int num;
     std::map<string, string> result;
     std::list<data_fild *> ready;
+    string error;
+  private:
+    int exec(data_fild *data);
 };
 

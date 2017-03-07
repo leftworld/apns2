@@ -23,12 +23,15 @@ extern "C" {
 #include "config.h"
 #endif
 
-	//#include "php.h"
-	//#include "php_ini.h"
-	//#include "ext/standard/info.h"
-#include "/data/php5/include/php/main/php.h"
-#include "/data/php5/include/php/main/php_ini.h"
-#include "/data/php5/include/php/ext/standard/info.h"	
+#include <fcntl.h>       
+#include <unistd.h>
+
+#include "php.h"
+#include "php_ini.h"
+#include "ext/standard/info.h"
+//#include "/data/php5/include/php/main/php.h"
+//#include "/data/php5/include/php/main/php_ini.h"
+//#include "/data/php5/include/php/ext/standard/info.h"	
 }
 #include "php_asiohttp2.h"
 #include "http2.h"
@@ -96,22 +99,9 @@ zend_object_value http2_create_handler(zend_class_entry *type TSRMLS_DC)
 	return retval;
 }
 
-PHP_FUNCTION(confirm_asiohttp2_compiled)
-{
-	char *arg = NULL;
-	int arg_len, len;
-	char *strg;
-
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
-		return;
-	}
-
-	len = spprintf(&strg, 0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "asiohttp2", arg);
-	RETURN_STRINGL(strg, len, 0);
-}
 zend_class_entry * http2_ce;
 
-PHP_METHOD(http2, __construct)
+PHP_METHOD(http20Client, __construct)
 {
 	http2 *h2 = NULL;
 	zval *object = getThis();
@@ -120,7 +110,8 @@ PHP_METHOD(http2, __construct)
 	http2_object *obj = (http2_object *)zend_object_store_get_object(object TSRMLS_CC);
 	obj->h2	= h2;
 }
-PHP_METHOD(http2, setHost)
+
+PHP_METHOD(http20Client, setHost)
 {
 	http2 *h2;
 	char *arg = NULL;
@@ -134,7 +125,7 @@ PHP_METHOD(http2, setHost)
 	h2->setHost((const char*)arg);
 }
 
-PHP_METHOD(http2, setPort)
+PHP_METHOD(http20Client, setPort)
 {
 	http2 *h2;        
 	char *arg = NULL; 
@@ -148,7 +139,7 @@ PHP_METHOD(http2, setPort)
 	h2->setPort((const char*)arg);
 }
 
-PHP_METHOD(http2, setPem)
+PHP_METHOD(http20Client, setPem)
 {
 	http2 *h2;
 	char *arg = NULL;
@@ -156,13 +147,17 @@ PHP_METHOD(http2, setPem)
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
 		return;       
 	}                 
+	if ((access(arg, 0)) == -1 )
+	{
+		RETURN_NULL();
+	}
 	http2_object *obj = (http2_object *)zend_object_store_get_object(
 			getThis() TSRMLS_CC);
 	h2 = obj->h2;     
 	h2->setPem((const char*)arg);
 }
 
-PHP_METHOD(http2, connect_init)
+PHP_METHOD(http20Client, connectInit)
 {
 	http2 *h2;
 	http2_object *obj = (http2_object *)zend_object_store_get_object(
@@ -172,7 +167,7 @@ PHP_METHOD(http2, connect_init)
 	RETURN_LONG(r);
 }
 
-PHP_METHOD(http2, connect_exec)
+PHP_METHOD(http20Client, connectExec)
 {
 	zval* z_array;
 	char* event_id;
@@ -233,7 +228,7 @@ PHP_METHOD(http2, connect_exec)
 	h2->add2ready(data);
 }
 
-PHP_METHOD(http2, wait_result)
+PHP_METHOD(http20Client, waitResult)
 {
 	http2 *h2;
 	http2_object *obj = (http2_object *)zend_object_store_get_object(
@@ -249,6 +244,23 @@ PHP_METHOD(http2, wait_result)
 	}
 	RETURN_ZVAL(ret, 0, 1);
 }
+
+PHP_METHOD(http20Client, getError)
+{
+	http2 *h2;
+	http2_object *obj = (http2_object *)zend_object_store_get_object(
+			getThis() TSRMLS_CC);
+	h2 = obj->h2;
+	int len = h2->error.size();
+	if (len == 0)
+	{
+		RETURN_NULL();
+	}
+	char* ret = (char*)emalloc(len);
+	memcpy(ret, h2->error.c_str(), len);
+	RETURN_STRINGL(ret, len, 0);
+}
+
 /* }}} */
 /* The previous line is meant for vim and emacs, so it can correctly fold and 
    unfold functions in source code. See the corresponding marks just before 
@@ -274,13 +286,14 @@ PHP_METHOD(http2, wait_result)
  *    */
 const zend_function_entry asiohttp2_functions[] = {
 	//PHP_FE(confirm_asiohttp2_compiled,    NULL)       /* For testing, remove later. */
-	PHP_ME(http2,  __construct,     NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
-		PHP_ME(http2,  setHost,           NULL, ZEND_ACC_PUBLIC)
-		PHP_ME(http2,  setPort,      NULL, ZEND_ACC_PUBLIC)
-		PHP_ME(http2,  setPem,           NULL, ZEND_ACC_PUBLIC)
-		PHP_ME(http2,  connect_init, NULL, ZEND_ACC_PUBLIC)
-		PHP_ME(http2,  connect_exec,  NULL, ZEND_ACC_PUBLIC)
-		PHP_ME(http2,  wait_result,  NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(http20Client,  __construct,     NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+		PHP_ME(http20Client,  setHost,           NULL, ZEND_ACC_PUBLIC)
+		PHP_ME(http20Client,  setPort,      NULL, ZEND_ACC_PUBLIC)
+		PHP_ME(http20Client,  setPem,           NULL, ZEND_ACC_PUBLIC)
+		PHP_ME(http20Client,  connectInit, NULL, ZEND_ACC_PUBLIC)
+		PHP_ME(http20Client,  connectExec,  NULL, ZEND_ACC_PUBLIC)
+		PHP_ME(http20Client,  waitResult,  NULL, ZEND_ACC_PUBLIC)
+		PHP_ME(http20Client,  getError,  NULL, ZEND_ACC_PUBLIC)
 		PHP_FE_END  /* Must be the last line in asiohttp2_functions[] */
 };
 /* }}} */
@@ -293,7 +306,7 @@ PHP_MINIT_FUNCTION(asiohttp2)
 	   REGISTER_INI_ENTRIES();
 	   */
 	zend_class_entry ce;
-	INIT_CLASS_ENTRY(ce, "http2", asiohttp2_functions);
+	INIT_CLASS_ENTRY(ce, "http20Client", asiohttp2_functions);
 	http2_ce = zend_register_internal_class(&ce TSRMLS_CC);
 	http2_ce->create_object = http2_create_handler;
 	memcpy(&http2_object_handlers,

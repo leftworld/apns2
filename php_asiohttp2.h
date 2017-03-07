@@ -36,8 +36,8 @@ extern zend_module_entry asiohttp2_module_entry;
 
 extern "C" {
 #ifdef ZTS
-//#include "TSRM.h"
-#include "/data/php5/include/php/TSRM/TSRM.h"
+#include "TSRM.h"
+//#include "/data/php5/include/php/TSRM/TSRM.h"
 #endif
 }
 /* 
