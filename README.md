@@ -5,7 +5,7 @@
 	high-performance over a million per minute!
 
 #example
-
+```php
 		$a = new http20Client(); 
 		$a->setHost("nghttp2.org"); 
 		$a->setPort("443");
@@ -25,3 +25,4 @@
 		print_r($d);
 		var_dump($error);
 		unset ($a);
+```
