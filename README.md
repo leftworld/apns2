@@ -6,6 +6,7 @@
 
 #Installation
 	1. Install libnghttp2 :
+		 visit to https://github.com/nghttp2/nghttp2 and clone it.
 		 autoreconf -i
 		 automake
 		 autoconf
