@@ -37,7 +37,6 @@ void http2::on_error(const boost::system::error_code &ec)
 
 http2::~http2()
 {
-  //cerr << "start delete" << endl;
   for(auto m : this->ready)
   {
     delete (m);
@@ -55,6 +54,10 @@ int http2::exec(data_fild *data)
   if (!data)
   {
     return -1;
+  }
+  if (!this->sess)
+  {
+    return -3;
   }
   string event_id = data->id;
   header_map h = {};
@@ -84,7 +87,7 @@ int http2::exec(data_fild *data)
               ptr->result[event_id] = str;
             }
           }
-        });
+          });
       });
   req->on_close(this->close_call);
   this->num++;
@@ -93,6 +96,14 @@ int http2::exec(data_fild *data)
 
 int http2::wait_result()
 {
+  if (!this->sess)
+  {
+    return -1;
+  }
+  if (this->num == 0)
+  {
+    return -2;
+  }
   this->io_service.run();
   return 0;
 }
@@ -128,12 +139,15 @@ int http2::init()
   {
     return -1;
   }
-
   if (this->port == "")
   {
     this->port = "443";
   }
   this->sess = new session(this->io_service, tls, this->host, this->port);
+  if (!this->sess)
+  {
+    return -2;
+  }
   this->sess->on_connect(this->connect_call);
   this->sess->on_error(this->error_call);
   return 0;
