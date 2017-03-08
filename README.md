@@ -4,6 +4,21 @@
 	base on libnghttp2 https://nghttp2.org  
 	high-performance over a million per minute!
 
+#Installation
+	1. Install libnghttp2 :
+		 autoreconf -i
+		 automake
+		 autoconf
+		 configure --enable-asio-lib
+		 make
+		 make install
+	2. Install asiohttp2:
+		 cd apns2 current path
+		 phpize
+		 ./configure --enable-asiohttp2
+		 make
+		 make install
+			
 #example
 ```php
 		$a = new http20Client(); 
