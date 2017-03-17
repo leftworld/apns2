@@ -1,10 +1,12 @@
 
 #apns2
+
 	apns2 gcm high-performance push module for php 5.6 
 	base on libnghttp2 https://nghttp2.org  
 	high-performance over a million per minute!
 
 #Installation
+
 	1. Install libnghttp2 :
 
 		 visit to https://github.com/nghttp2/nghttp2 and clone it.
