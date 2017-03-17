@@ -33,7 +33,9 @@
 
 		 make
 
-		 make install
+		 sudo make install
+	
+		 add "extension=asiohttp2.so" to your php.ini
 			
 #example
 ```php
