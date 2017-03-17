@@ -100,10 +100,10 @@ int http2::wait_result()
   {
     return -1;
   }
-  if (this->num == 0)
-  {
-    return -2;
-  }
+  //if (this->num == 0)
+  //{
+  //  return -2;
+ // }
   this->io_service.run();
   return 0;
 }
