@@ -1,7 +1,9 @@
 
 #apns2
 
-	apns2 gcm high-performance concurrence push module for php 5.6 
+	HTTP/2 Apple Push Notification Service (APNs) push provider  
+	Google Cloud Messaging (HTTP/2) (GCM)
+	high-performance concurrence push module for php 5.6 
 	base on libnghttp2 https://nghttp2.org  
 	high-performance over a million per minute!
 
@@ -70,4 +72,6 @@
 
 #attention
 
-		class "http20Client" Every time works needs to be created. one "http20Client" object Can be used only once. After use "unset" destroy object.
+		class "http20Client" Every time works needs to be created. 
+		one "http20Client" object Can be used only once. 
+		After use "unset" destroy object.
