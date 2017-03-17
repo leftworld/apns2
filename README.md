@@ -7,7 +7,7 @@
 
 #Installation
 
-	1. Install libnghttp2 :
+	1. Install libnghttp2 : require libs: boost_system ssl crypto
 
 		 visit to https://github.com/nghttp2/nghttp2 and clone it.
 
