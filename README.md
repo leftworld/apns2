@@ -45,8 +45,8 @@
 		$a = new http20Client(); 
 		$a->setHost("nghttp2.org"); 
 		$a->setPort("443");
-		//$a->setPem("./cert.pem"); //apple apns2 reqiured ,goole not reqiured
-		//$a->setPass("pass"); //support certificate password verification
+		//$a->setPem("./cert.pem"); //apple apns2 reqiured ,google not reqiured
+		//$a->setPass("pass"); //support certificate password verification for apple
 		$d = $a->connectInit();
 		for($i=0; $i < 10; $i++) //$i less than 10000 a loop.
 		{
