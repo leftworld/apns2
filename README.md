@@ -1,5 +1,5 @@
 
-#apns2
+# apns2
 
 	HTTP/2 Apple Push Notification Service (APNs) push provider  
 	Google Cloud Messaging (HTTP/2) (GCM)
@@ -7,7 +7,7 @@
 	base on libnghttp2 https://nghttp2.org  
 	high-performance over a million per minute!
 
-#Installation
+# Installation
 
 	1. Install libnghttp2 : require libs: boost_system ssl crypto
 
@@ -44,7 +44,7 @@
 		 test: php asiohttp2.php 
 
 			
-#example
+# example
 ```php
 		<?php
 		$a = new http20Client(); 
@@ -70,8 +70,127 @@
 		?>
 ```
 
-#attention
+# attention
 
 		class "http20Client" Every time works needs to be created. 
 		one "http20Client" object Can be used only once. 
 		After use "unset" destroy object.
+		
+
+# multiprocess example
+
+
+```php
+<?php
+
+$config = [
+	"api.push.apple.com" => ["port"=>443, "pem"=>"./a.pem", "pass"=> "pass"]
+];
+
+class data_struct{
+	public $host;
+	public $body;
+	public $method;
+	public $url;
+	public $headers = [];
+}
+
+$process_num = 16;
+
+for($i = 0; $i < $process_num; $i++)
+{
+	$pid = pcntl_fork();
+	if ($pid == -1)
+	{
+		die("error");
+	}
+	if ($pid == 0)
+	{
+		todo();
+		exit;	
+	}
+}
+$status;
+pcntl_wait($status);
+
+function todo()
+{
+	$redis = new redis_client();
+	$redes->connect("127.0.0.1",6379);
+	$send_buff = array();
+	for(;;)
+	{
+		$data = $redis->lpop("key");
+		if ($data == NULL)
+		{
+			if (count($send_buff) == 0)
+			{
+				$data = $redis->blpop("key");
+			}else{
+				process_data($send_buff);
+				$send_buff = [];
+			}
+		}else{
+			$send_buff[$data->host][] = $data;
+			$i = 0;
+			foreach($send_buff as $k => $v)
+			{
+				$i += count($v);	
+			}
+			if ($i >= 10000)
+			{
+				process_data($send_buff);
+				$send_buff = [];
+			}
+		}
+	}
+}
+
+function process_data(&$send_buff)
+{
+	foreach($send_buff as $k => $v)
+	{        
+		$result = send_data($k, $v);
+		foreach($v as $key => $val)
+		{
+			if (isset($result[$key]) && $result[$key]["code"] == 200)
+			{   
+				//send_ok       
+			}else{
+				process_error($v);
+			}
+		}
+	}
+}
+
+
+function process_error($arr)
+{
+	//todo
+}
+
+function send_data($host, $data)
+{
+	global $config;
+	$h2 = new http20Client(); 
+	$h2->setHost("$host"); 
+	$h2->setPort($config["$host"]["port"]);
+	if (isset($config["$host"]["pem"]))
+	{
+		$h2->setPem($config["$host"]["pem"]); //apple apns2 reqiured ,google not reqiured
+	}
+	if (isset($config["$host"]["pass"]))
+	{
+		$h2->setPass($config["$host"]["pass"]); //support certificate password verification for apple
+	}
+	$h2->connectInit();
+	foreach($data as $k => $v)
+	{
+		$h2->connectExec("$k", $v);
+	}
+	$result = $h2->waitResult();
+	unset ($h2);
+	return $result;
+}
+?>
+```
