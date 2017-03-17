@@ -67,3 +67,7 @@
 		unset ($a);
 		?>
 ```
+
+#attention
+
+		class "http20Client" Every time works needs to be created. one "http20Client" object Can be used only once. After use "unset" destroy object.
