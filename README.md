@@ -46,6 +46,7 @@
 		$a->setHost("nghttp2.org"); 
 		$a->setPort("443");
 		//$a->setPem("./cert.pem");
+    //$a->setPass("pass"); //support certificate password verification
 		$d = $a->connectInit();
 		for($i=0; $i < 10; $i++)
 		{
