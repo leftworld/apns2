@@ -38,6 +38,9 @@
 		 sudo make install
 	
 		 add "extension=asiohttp2.so" to your php.ini
+
+		 test: php asiohttp2.php 
+
 			
 #example
 ```php
