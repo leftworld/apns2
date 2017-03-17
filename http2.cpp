@@ -42,11 +42,9 @@ http2::~http2()
     delete (m);
   }
   this->ready.clear();
-  this->result.clear();
   if (this->sess)
     delete(this->sess);
   this->sess = NULL;
-  //cerr << "deleted" << endl;
 }
 
 int http2::exec(data_fild *data)
@@ -75,6 +73,7 @@ int http2::exec(data_fild *data)
   }
   auto ptr = this;
   req->on_response([ptr, event_id](const response& res){
+      ptr->response_code[event_id] = res.status_code();
       res.on_data([ptr, event_id](const uint8_t *data, std::size_t len) {
           if (len > 0)
           {
@@ -100,10 +99,10 @@ int http2::wait_result()
   {
     return -1;
   }
-  //if (this->num == 0)
-  //{
-  //  return -2;
- // }
+  if (this->ready.size() == 0)
+  {
+    return -2;
+  }
   this->io_service.run();
   return 0;
 }
@@ -126,13 +125,30 @@ int http2::setPem(const char* pem)
   return 0;
 }
 
+string http2::get_password()
+{
+  return this->password;
+}
+
+int http2::set_password(const char * str)
+{
+  this->password = str;
+  return 0;
+}
+
 int http2::init()
 {
   boost::asio::ssl::context tls(boost::asio::ssl::context::sslv23);
   tls.set_default_verify_paths();
   if (this->pem_path.size() > 0)
   {
-    tls.use_certificate_chain_file(this->pem_path);
+    tls.set_verify_mode(boost::asio::ssl::verify_peer);
+    if (this->password.size() > 0)
+    {
+      tls.set_password_callback(bind(&http2::get_password, this));
+      tls.use_private_key_file(this->pem_path, boost::asio::ssl::context::pem);
+    }
+    tls.use_certificate_file(this->pem_path, boost::asio::ssl::context::pem);
   }
   configure_tls_context(this->ec, tls);
   if (this->host.size() == 0)

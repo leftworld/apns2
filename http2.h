@@ -35,6 +35,8 @@ class http2{
     void on_connect(boost::asio::ip::tcp::resolver::iterator it);
     void on_close(uint32_t error_code);
     void on_error(const boost::system::error_code &ec);
+    string get_password();
+    int set_password(const char * str);
   public:
     boost::system::error_code ec;
     boost::asio::io_service io_service;
@@ -49,6 +51,8 @@ class http2{
     std::map<string, string> result;
     std::list<data_fild *> ready;
     string error;
+    string password;
+    std::map<string, int> response_code;
   private:
     int exec(data_fild *data);
 };

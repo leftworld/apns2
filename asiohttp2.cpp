@@ -157,6 +157,21 @@ PHP_METHOD(http20Client, setPem)
 	h2->setPem((const char*)arg);
 }
 
+PHP_METHOD(http20Client, setPass)
+{
+	http2 *h2;
+	char *arg = NULL;
+	int arg_len;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+		return;
+	}
+	http2_object *obj = (http2_object *)zend_object_store_get_object(
+			getThis() TSRMLS_CC);
+	h2 = obj->h2;
+	h2->set_password((const char*)arg);
+}
+
+
 PHP_METHOD(http20Client, connectInit)
 {
 	http2 *h2;
@@ -217,7 +232,7 @@ PHP_METHOD(http20Client, connectExec)
 					ulong hidx;
 					if (zend_hash_get_current_key(Z_ARRVAL_PP(z_item), &hkey, &hidx, 0) == HASH_KEY_IS_STRING) {
 						zend_hash_get_current_data(Z_ARRVAL_PP(z_item), (void**) &h_item);
-						data->headers.insert(std::make_pair(key, Z_STRVAL_PP(h_item)));
+						data->headers.insert(std::make_pair(hkey, Z_STRVAL_PP(h_item)));
 						zend_hash_move_forward(Z_ARRVAL_PP(z_item));
 					}
 				}
@@ -238,9 +253,14 @@ PHP_METHOD(http20Client, waitResult)
 	zval * ret;
 	MAKE_STD_ZVAL(ret);
 	array_init(ret);
-	for(auto m : h2->result)
+	for(auto m : h2->response_code)
 	{
-		add_assoc_string(ret, (char*)m.first.c_str(), (char*)m.second.c_str(), 1);
+		zval * tmp;
+		MAKE_STD_ZVAL(tmp);
+		array_init(tmp);
+		add_assoc_long(tmp, "code", m.second);
+		add_assoc_string(tmp, "body", (char*)h2->result[m.first].c_str(), 1);
+		add_assoc_zval(ret, (const char*)m.first.c_str(), tmp);
 	}
 	RETURN_ZVAL(ret, 0, 1);
 }
@@ -290,6 +310,7 @@ const zend_function_entry asiohttp2_functions[] = {
 		PHP_ME(http20Client,  setHost,           NULL, ZEND_ACC_PUBLIC)
 		PHP_ME(http20Client,  setPort,      NULL, ZEND_ACC_PUBLIC)
 		PHP_ME(http20Client,  setPem,           NULL, ZEND_ACC_PUBLIC)
+		PHP_ME(http20Client,  setPass,           NULL, ZEND_ACC_PUBLIC)
 		PHP_ME(http20Client,  connectInit, NULL, ZEND_ACC_PUBLIC)
 		PHP_ME(http20Client,  connectExec,  NULL, ZEND_ACC_PUBLIC)
 		PHP_ME(http20Client,  waitResult,  NULL, ZEND_ACC_PUBLIC)
