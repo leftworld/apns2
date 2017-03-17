@@ -126,11 +126,20 @@ function todo()
 			if (count($send_buff) == 0)
 			{
 				$data = $redis->blpop("key");
+				if (!isset($send_buff[$data->host]))
+				{
+					$send_buff[$data->host] = [];
+				}
+				$send_buff[$data->host][] = $data;
 			}else{
 				process_data($send_buff);
 				$send_buff = [];
 			}
 		}else{
+			if (!isset($send_buff[$data->host]))
+			{
+				$send_buff[$data->host] = [];
+			}
 			$send_buff[$data->host][] = $data;
 			$i = 0;
 			foreach($send_buff as $k => $v)
