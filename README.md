@@ -1,7 +1,7 @@
 
 #apns2
 
-	apns2 gcm high-performance push module for php 5.6 
+	apns2 gcm high-performance concurrence push module for php 5.6 
 	base on libnghttp2 https://nghttp2.org  
 	high-performance over a million per minute!
 
@@ -45,10 +45,10 @@
 		$a = new http20Client(); 
 		$a->setHost("nghttp2.org"); 
 		$a->setPort("443");
-		//$a->setPem("./cert.pem");
-    //$a->setPass("pass"); //support certificate password verification
+		//$a->setPem("./cert.pem"); //apple apns2 reqiured ,goole not reqiured
+		//$a->setPass("pass"); //support certificate password verification
 		$d = $a->connectInit();
-		for($i=0; $i < 10; $i++)
+		for($i=0; $i < 10; $i++) //$i less than 10000 a loop.
 		{
 		  $a->connectExec("$i",
 		  array("body"=>"",
@@ -59,7 +59,7 @@
 		}
 		$d = $a->waitResult();
 		$error = $a->getError();
-		print_r($d);
+		print_r($d); 
 		var_dump($error);
 		unset ($a);
 		?>
