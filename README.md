@@ -6,28 +6,44 @@
 
 #Installation
 	1. Install libnghttp2 :
+
 		 visit to https://github.com/nghttp2/nghttp2 and clone it.
+
 		 autoreconf -i
+
 		 automake
+
 		 autoconf
+
 		 configure --enable-asio-lib
+
 		 make
-		 make install
+
+		 sudo make install
+
+		 sudo ldconfig
+
 	2. Install asiohttp2:
+
 		 cd apns2 current path
+
 		 phpize
+
 		 ./configure --enable-asiohttp2
+
 		 make
+
 		 make install
 			
 #example
 ```php
+		<?php
 		$a = new http20Client(); 
 		$a->setHost("nghttp2.org"); 
 		$a->setPort("443");
 		//$a->setPem("./cert.pem");
 		$d = $a->connectInit();
-		for($i=0; $i < 200; $i++)
+		for($i=0; $i < 10; $i++)
 		{
 		  $a->connectExec("$i",
 		  array("body"=>"",
@@ -41,4 +57,5 @@
 		print_r($d);
 		var_dump($error);
 		unset ($a);
+		?>
 ```
