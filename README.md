@@ -19,7 +19,7 @@
 
 		 autoconf
 
-		 configure --enable-asio-lib
+		 ./configure --enable-asio-lib
 
 		 make
 
