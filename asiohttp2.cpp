@@ -226,6 +226,7 @@ PHP_METHOD(http20Client, connectExec)
 				int header_len = zend_hash_num_elements(Z_ARRVAL_PP(z_item));
 				int j = 0;
 				zval ** h_item;
+				zend_hash_internal_pointer_reset(Z_ARRVAL_PP(z_item));
 				for(j = 0; j < header_len; j++)
 				{
 					char *hkey;
